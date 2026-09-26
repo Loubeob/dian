@@ -11,10 +11,10 @@ class AlexNet(nn.Module):
         super().__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 96, 11, 4), nn.ReLU(), nn.MaxPool2d(3, 2),
-            nn.Conv2d(96, 256, 5, 2), nn.ReLU(), nn.MaxPool2d(3, 2),
-            nn.Conv2d(256, 384, 3), nn.ReLU(),
-            nn.Conv2d(384, 384, 3), nn.ReLU(),
-            nn.Conv2d(384, 256, 3), nn.ReLU(), nn.MaxPool2d(3, 2),
+            nn.Conv2d(96, 256, 5, padding=2), nn.ReLU(), nn.MaxPool2d(3, 2),
+            nn.Conv2d(256, 384, 3, padding=1), nn.ReLU(),
+            nn.Conv2d(384, 384, 3, padding=1), nn.ReLU(),
+            nn.Conv2d(384, 256, 3, padding=1), nn.ReLU(), nn.MaxPool2d(3, 2),
         )
         self.classifier = nn.Sequential(
             nn.Dropout(), nn.Linear(256 * 6 * 6, 4096), nn.ReLU(),
@@ -23,7 +23,8 @@ class AlexNet(nn.Module):
         )
 
     def forward(self, x):
-        return self.classifier(self.features(x))
+        x = self.features(x)
+        return self.classifier(x.view(x.size(0), -1))
 
 
 # ===== VGG: 重复堆叠小卷积核(3x3), 网络模块化 =====
@@ -31,7 +32,6 @@ class VGG(nn.Module):
     def __init__(self, num_classes=10):
         super().__init__()
         self.features = nn.Sequential(
-            # 每段 = 2个3x3卷积 + 池化
             nn.Conv2d(3, 64, 3, padding=1), nn.ReLU(),
             nn.Conv2d(64, 64, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),
             nn.Conv2d(64, 128, 3, padding=1), nn.ReLU(),
@@ -80,9 +80,9 @@ class ResNet(nn.Module):
 
 # ===== 前向测试: 随机数据跑通每个网络 =====
 if __name__ == '__main__':
-    x = torch.randn(2, 3, 227, 227)  # AlexNet需要224+输入
+    x = torch.randn(2, 3, 227, 227)
     print('AlexNet:', AlexNet()(x).shape)
-    x = torch.randn(2, 3, 64, 64)
+    x = torch.randn(2, 3, 32, 32)
     print('VGG:', VGG()(x).shape)
     print('ResNet:', ResNet()(x).shape)
     print('三个网络前向传播全部通过')
