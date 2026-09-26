@@ -1,4 +1,4 @@
-# 环境/系统目录
+# env/system
 miniconda3/
 .local/
 .cache/
@@ -18,7 +18,7 @@ __pycache__/
 .wget-hsts
 .bash_history
 
-# 大数据集（不推）
+# big data
 dataset.zip
 level4/dataset/
 level4/dataset.zip
@@ -26,6 +26,8 @@ level4/unet测试/dataset/
 level4/unet测试/dataset.zip
 data/
 
-# 模型文件（超100MB）
-*.pth
+# big models (>100MB)
+level4/unet测试/checkpoints/unet_v4/unet_best.pth
+level4/unet测试/checkpoints/unet_v4/unet_best4.pth
+level4/unet测试/checkpoints/unet_v4/unet_epoch*.pth
 *.Zone.Identifier

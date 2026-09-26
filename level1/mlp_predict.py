@@ -36,7 +36,11 @@ if __name__ == '__main__':
         sys.exit(1)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = MLP().to(device)
-    ckpt = torch.load('/home/lf/checkpoints/mlp_mnist_best.pth', map_location=device, weights_only=False)
+    import os
+    ckpt_path = './mlp_mnist_best.pth'
+    if not os.path.exists(ckpt_path):
+        ckpt_path = '/home/lf/checkpoints/mlp_mnist_best.pth'
+    ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
     model.load_state_dict(ckpt['model_state_dict'])
     model.eval()
     img = Image.open(sys.argv[1]).convert('L').resize((28, 28))

@@ -12,10 +12,11 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 IMG_SIZE = 512
 
 
-def load_model(ckpt_path='./checkpoints/unet_v4/unet_best4.pth'):
+def load_model(ckpt_path='./checkpoints/unet_v4/unet_best4_compressed.pth'):
     model = UNet(in_channels=3, out_channels=3).to(DEVICE)
     ckpt = torch.load(ckpt_path, map_location=DEVICE, weights_only=False)
-    model.load_state_dict(ckpt['model_state_dict'])
+    state = {k: v.float() for k, v in ckpt['model_state_dict'].items()}
+    model.load_state_dict(state)
     model.eval()
     print(f'模型加载成功, PSNR: {ckpt["psnr"]:.2f}dB')
     return model
