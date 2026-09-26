@@ -1,0 +1,31 @@
+# 环境/系统目录
+miniconda3/
+.local/
+.cache/
+.conda/
+.config/
+.jupyter/
+.ipython/
+.anaconda/
+.nv/
+.vscode-server/
+.dotnet/
+.copilot/
+新建文件夹/
+__pycache__/
+*.pyc
+.python_history
+.wget-hsts
+.bash_history
+
+# 大数据集（不推）
+dataset.zip
+level4/dataset/
+level4/dataset.zip
+level4/unet测试/dataset/
+level4/unet测试/dataset.zip
+data/
+
+# 模型文件（超100MB）
+*.pth
+*.Zone.Identifier
