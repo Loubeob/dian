@@ -6,7 +6,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 from PIL import Image, ImageOps
-from torchvision import transforms
 
 
 class MLP(nn.Module):
@@ -32,23 +31,12 @@ class MLP(nn.Module):
 
 
 def preprocess(img):
-    """把任意手写图转成 MNIST 风格: 黑底白字 + 数字居中 28x28"""
+    """转成 MNIST 风格: 黑底白字 + 28x28"""
     img = img.convert('L')
-    # 统一成"黑底白字"(MNIST风格): 平均亮说明是白底黑字, 反转
+    # 白底黑字(平均亮) -> 反转成黑底白字; 黑底白字保持
     if np.mean(np.array(img)) >= 128:
         img = ImageOps.invert(img)
-    a = np.array(img)
-    ys, xs = np.where(a > 128)  # 笔画=亮像素
-    if len(xs) == 0:
-        return np.zeros((28, 28), dtype=np.float32)
-    x1, x2, y1, y2 = xs.min(), xs.max(), ys.min(), ys.max()
-    pad = 2
-    x1 = max(0, x1 - pad); y1 = max(0, y1 - pad)
-    x2 = min(a.shape[1], x2 + pad); y2 = min(a.shape[0], y2 + pad)
-    crop = img.crop((x1, y1, x2, y2)).resize((20, 20))
-    out = Image.new('L', (28, 28), 0)  # 黑底
-    out.paste(crop, (4, 4))  # 居中
-    return np.array(out, dtype=np.float32) / 255.0
+    return img.resize((28, 28))
 
 
 if __name__ == '__main__':
@@ -65,8 +53,8 @@ if __name__ == '__main__':
     model.load_state_dict(ckpt['model_state_dict'])
     model.eval()
     img = Image.open(sys.argv[1])
-    x = preprocess(img)
-    tensor = torch.from_numpy(x).unsqueeze(0).unsqueeze(0).to(device)
+    img = preprocess(img)
+    tensor = transforms.ToTensor()(img).unsqueeze(0).to(device)
     tensor = (tensor - 0.1307) / 0.3081
     with torch.no_grad():
         out = model(tensor)
